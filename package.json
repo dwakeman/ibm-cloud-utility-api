@@ -1,0 +1,18 @@
+{
+    "name": "ibm-cloud-utility-api",
+    "version": "1.0.0",
+    "description": "Utility API for IBM Cloud",
+    "main": "app.js",
+    "private": true,
+    "scripts": {
+        "start": "node app.js"
+    },
+    "engines": {
+        "node": "10.16.3"
+    },
+    "dependencies": {
+        "express": "^4.13.4",
+        "body-parser": "^1.18.3",
+        "log4js": "^5.2.0"
+    }
+}
