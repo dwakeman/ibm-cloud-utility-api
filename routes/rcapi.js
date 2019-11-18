@@ -19,7 +19,7 @@ const https = require('https');
 const querystring = require('querystring');
 const log4js = require('log4js');
 const logger = log4js.getLogger(appName);
-logger.level = 'debug';
+logger.level = 'trace';
 
 /**
  * Module object that is this module
@@ -59,6 +59,10 @@ rcapi.getInstanceUses = async (req, res, next) => {
 
         let instance = await callApi(req, path);
 
+        // NOTE:  An instance can have resource bindings but right now this function is not retrieving them!!!!
+
+
+        
         logger.debug('[getInstanceUses] instance crn split is: ' + instance.target_crn.split(":"));
 
         // get the resource group name in which the alias is located
@@ -92,7 +96,7 @@ rcapi.getInstanceUses = async (req, res, next) => {
 
 
             let crn = alias.target_crn.split(":")
-//            logger.trace('[getInstanceUses] binding crn split is: ' + crn[7]);
+            logger.debug('[getInstanceUses] binding crn split is: ' + crn);
 
             // get the name of the target for the alias
             if (crn[7]) {
@@ -101,7 +105,10 @@ rcapi.getInstanceUses = async (req, res, next) => {
                 resource.target_service_name = targetService.name;
                 resource.target_service_url = targetService.url;
             }
-            
+
+                // add the target resource info
+                resource.crn_resource_type = crn[8];
+                resource.crn_resource = crn[9];
 
             let resourceGroup = await callApi(req, '/v2/resource_groups/' + alias.resource_group_id);
             resource.resource_group_name = resourceGroup.name;
@@ -123,6 +130,7 @@ rcapi.getInstanceUses = async (req, res, next) => {
                 binding.resource_group_name = bindingResourceGroup.name;
 
                 // get the name of the target for the binding
+                // NOTE:  Also need to figure out how to get the space name and app name.  Also, put GUIDs in now.
                 let bindingCrn = b.target_crn.split(":")
                 if (bindingCrn[7]) {
                     let bindingTargetService = await callApi(req, '/v2/resource_instances/' + bindingCrn[7]);
@@ -130,7 +138,10 @@ rcapi.getInstanceUses = async (req, res, next) => {
                     binding.target_service_name = bindingTargetService.name;
                     binding.target_service_url = bindingTargetService.url
                 }
-
+                
+                // add the target resource info
+                binding.crn_resource_type = bindingCrn[8];
+                binding.crn_resource = bindingCrn[9];
                 bindingList.push(binding);
             }
             item.resource = resource;
@@ -152,7 +163,35 @@ rcapi.getInstanceUses = async (req, res, next) => {
     
     };
 
+/**
+ * Get a key from Key Protect
+ * 
+ * This function is mapped to the '/key/:keyid' route in the API
+ * It will retrieve a key from an instance of Key Protect
+ * 
+ * Method: GET
+ * 
+ * NOTE: This method requires the following environment variables
+ *       KEY_PROTECT_INSTANCE - the GUID of your Key Protect instance
+ *       IBM_API_KEY - a valid API key for a user or service id that has access to the Key Protect instance
+ */
+rcapi.getToken = async (req, res, next) => {
 
+        logger.debug('[getToken] Entering function.....')
+    
+        logger.debug('[getToken] request headers:');
+        logger.debug(JSON.stringify(req.headers));
+
+    
+        
+        let response = await getAuthToken(req);
+    
+        logger.debug('[getToken] Exiting function.....' + JSON.stringify(response));
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.write(JSON.stringify(response));
+        res.end();
+    
+    };
 
 
 /**
@@ -179,6 +218,7 @@ rcapi.getResourceInstances = async (req, res, next) => {
     logger.debug('[getResourceInstances] Entering function.....');
     logger.debug('[getResourceInstances] Request parameters');
     logger.debug('[getResourceInstances] Resource Instance ID: ' + instanceId);
+    logger.debug('[getResourceInstances] path: ' + path);
 
     
     let response = await callApi(req, path);
@@ -252,7 +292,7 @@ async function callApi(req, path) {
 
     const headers = {
         'Accept': 'application/json',
-        'Authorization': authToken
+        'Authorization': 'Bearer ' + authToken.access_token
     }
 
     const options = {
@@ -308,17 +348,21 @@ function getAuthToken(req) {
 
     logger.trace('[getAuthToken] entering function....');
     logger.trace('[getAuthToken] Authorization header is ' + req.headers.authorization);
+    logger.debug('[getAuthToken] x-api-key header is ' + req.headers['x-api-key']);
+    logger.debug('[getAuthToken] headers: ' + JSON.stringify(req.headers));
+
+    let apiKey = req.headers['x-api-key'];
     return new Promise ((resolve, reject) => {
 
         if (req.headers.authorization) {
-            logger.trace('[getAuthToken] Found an Authorization header.... will use that.')
+            logger.debug('[getAuthToken] Found an Authorization header.... will use that.')
             resolve(req.headers.authorization)
-        }else{
-            logger.trace('[getAuthToken] exchanging API key for auth token ')
+        } else if (req.headers['x-api-key']) {
+            logger.debug('[getAuthToken] exchanging API key for auth token ');
 
             const formData = querystring.stringify({
                 "grant_type": "urn:ibm:params:oauth:grant-type:apikey",
-                "apikey": process.env.IBM_API_KEY
+                "apikey": apiKey
             });
         
             const headers = {
@@ -347,17 +391,23 @@ function getAuthToken(req) {
                 });
 
                 res.on('end', () =>{
-                    logger.trace('[getAuthToken] exiting with success....');
+                    logger.debug('[getAuthToken] exiting with success....');
                     body = JSON.parse(rawbody);
-                    resolve('Bearer ' + body.access_token);                
+                    resolve(body);                
                 });
-            })
-        }
-    });
 
-    logger.debug('[getAuthToken] writing form data');
-    req.write(formData);
-    req.end();
+
+
+            })
+
+            logger.debug('[getAuthToken] writing form data');
+            req.write(formData);
+            req.end();
+        }
+
+
+
+    });
 }; //end of function getAuthToken
 
 

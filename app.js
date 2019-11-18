@@ -14,14 +14,24 @@
  *  limitations under the License.
  */
 
-const express = require("express");
+
+const express = require('express');
 var app = express();
 const log4js = require('log4js');
 const appName = require('./package').name;
 const bodyParser = require('body-parser');
 const rcapi = require('./routes/rcapi');
 const logger = log4js.getLogger(appName);
-logger.level ='debug';
+logger.level ='trace';
+
+
+// enabling Cross Origin support
+app.use(function(req, res, next) {
+	res.setHeader('Access-Control-Allow-Origin', '*');
+	res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+	res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, x-api-key, content-type, Authorization');
+	next();
+});
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -34,6 +44,7 @@ app.get('/health',(req,res) => {
     res.send({ "status" : "UP" });
 });
 
+app.post('/token', rcapi.getToken);
 app.get('/instances', rcapi.getResourceInstances);
 app.get('/instances/:instanceid', rcapi.getResourceInstances);
 app.get('/instances/:instanceid/uses', rcapi.getInstanceUses);
