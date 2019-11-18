@@ -1,0 +1,4 @@
+applications:
+- buildpack: sdk-for-nodejs
+  name: utility-api
+  memory: 256M

@@ -285,14 +285,23 @@ async function callApi(req, path) {
 
     logger.trace('[callApi] entering function....');
 
-    let authToken = await getAuthToken(req);
+    let token = '';
+    // need to check here if we have an authorization header and if we do, skip this call and use the header (includes 'Bearer ')
+    if (req.headers.authorization) {
+        authToken = req.headers.authorization;
+    } else {
+        let newToken = await getAuthToken(req);
+        authToken = 'Bearer ' + newToken.access_token;
+    }
+//    let newToken = await getAuthToken(req);
+    // getAuthToken should return the full object as returned from the IAM API.  
 
     logger.trace('[callApi] The authentication token is ' + authToken);
     logger.trace('[callApi] The path is ' + path);
 
     const headers = {
         'Accept': 'application/json',
-        'Authorization': 'Bearer ' + authToken.access_token
+        'Authorization': authToken
     }
 
     const options = {
@@ -347,17 +356,18 @@ async function callApi(req, path) {
 function getAuthToken(req) {
 
     logger.trace('[getAuthToken] entering function....');
-    logger.trace('[getAuthToken] Authorization header is ' + req.headers.authorization);
+//    logger.trace('[getAuthToken] Authorization header is ' + req.headers.authorization);
     logger.debug('[getAuthToken] x-api-key header is ' + req.headers['x-api-key']);
     logger.debug('[getAuthToken] headers: ' + JSON.stringify(req.headers));
 
     let apiKey = req.headers['x-api-key'];
     return new Promise ((resolve, reject) => {
-
+/*
         if (req.headers.authorization) {
             logger.debug('[getAuthToken] Found an Authorization header.... will use that.')
             resolve(req.headers.authorization)
         } else if (req.headers['x-api-key']) {
+*/
             logger.debug('[getAuthToken] exchanging API key for auth token ');
 
             const formData = querystring.stringify({
@@ -403,7 +413,7 @@ function getAuthToken(req) {
             logger.debug('[getAuthToken] writing form data');
             req.write(formData);
             req.end();
-        }
+        
 
 
 
