@@ -16,6 +16,7 @@
 
 const appName = require('../package').name;
 const https = require('https');
+var url = require('url');
 const querystring = require('querystring');
 const log4js = require('log4js');
 const logger = log4js.getLogger(appName);
@@ -42,10 +43,16 @@ const rcapi = {};
 rcapi.proxyApi = async (req, res, next) => {
 
     logger.trace('[proxyApi] Entering function.....');
-
+/*
     let path=req.path;
+    let results={
+        path: req.path,
+        url: req.url
+    //    queryString: 'query string: ' + 
 
-    let results = await callApi(req, path);
+    }
+*/
+    let results = await callApi(req, req.url);
 
     logger.trace('[proxyApi] Exiting function.....');
     res.writeHead(200, {'Content-Type': 'application/json'});
