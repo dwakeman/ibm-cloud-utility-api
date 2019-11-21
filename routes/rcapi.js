@@ -39,6 +39,33 @@ const rcapi = {};
  *       KEY_PROTECT_INSTANCE - the GUID of your Key Protect instance
  *       IBM_API_KEY - a valid API key for a user or service id that has access to the Key Protect instance
  */
+rcapi.proxyApi = async (req, res, next) => {
+
+    logger.trace('[proxyApi] Entering function.....');
+
+    let path=req.path;
+
+    let results = await callApi(req, path);
+
+    logger.trace('[proxyApi] Exiting function.....');
+    res.writeHead(200, {'Content-Type': 'application/json'});
+    res.write(JSON.stringify(results));
+    res.end();    
+
+}
+
+/**
+ * Get a key from Key Protect
+ * 
+ * This function is mapped to the '/key/:keyid' route in the API
+ * It will retrieve a key from an instance of Key Protect
+ * 
+ * Method: GET
+ * 
+ * NOTE: This method requires the following environment variables
+ *       KEY_PROTECT_INSTANCE - the GUID of your Key Protect instance
+ *       IBM_API_KEY - a valid API key for a user or service id that has access to the Key Protect instance
+ */
 rcapi.getInstanceUses = async (req, res, next) => {
 
     // This is the use case where sensitive data is to be wrapped by a root key.  

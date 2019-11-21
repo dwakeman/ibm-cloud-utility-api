@@ -44,6 +44,8 @@ app.get('/health',(req,res) => {
     res.send({ "status" : "UP" });
 });
 
+
+app.get('/v2/*', rcapi.proxyApi);
 app.post('/token', rcapi.getToken);
 app.get('/instances', rcapi.getResourceInstances);
 app.get('/instances/:instanceid', rcapi.getResourceInstances);
