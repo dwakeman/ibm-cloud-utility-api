@@ -55,9 +55,6 @@ rcapi.proxyApi = async (req, res, next) => {
     let results = await callApi(req, req.url);
 
     logger.trace('[proxyApi] Exiting function.....');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-	res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
-	res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, x-api-key, content-type, Authorization');
     res.writeHead(200, {'Content-Type': 'application/json'});
     res.write(JSON.stringify(results));
     res.end();    
