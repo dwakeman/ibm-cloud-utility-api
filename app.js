@@ -42,9 +42,19 @@ app.get('/',(req,res) => {
 });
 
 app.get('/health',(req,res) => {
-    res.send({ "status" : "UP" });
+    res.send({ 
+        "status" : "UP",
+        "region" : process.env.APP_REGION ? process.env.APP_REGION : "local",
+        "runtime": process.env.APP_RUNTIME ? process.env.APP_RUNTIME : "localhost"
+    });
 });
 
+app.get('/info',(req,res) => {
+    res.send({
+        "region" : process.env.APP_REGION ? process.env.APP_REGION : "local",
+        "runtime": process.env.APP_RUNTIME ? process.env.APP_RUNTIME : "localhost"
+    });
+});
 
 app.get('/v2/*', rcapi.proxyApi);
 app.post('/token', rcapi.getToken);
