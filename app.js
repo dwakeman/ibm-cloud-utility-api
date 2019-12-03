@@ -21,6 +21,7 @@ const log4js = require('log4js');
 const appName = require('./package').name;
 const bodyParser = require('body-parser');
 const rcapi = require('./routes/rcapi');
+const iamapi = require('./routes/iamapi');
 const logger = log4js.getLogger(appName);
 logger.level ='trace';
 
@@ -57,7 +58,8 @@ app.get('/info',(req,res) => {
 });
 
 app.get('/v2/*', rcapi.proxyApi);
-app.post('/token', rcapi.getToken);
+app.post('/token', iamapi.getToken);
+app.get('/resource_groups', rcapi.getResourceGroups);
 app.get('/instances', rcapi.getResourceInstances);
 app.get('/instances/:instanceid', rcapi.getResourceInstances);
 app.get('/instances/:instanceid/uses', rcapi.getInstanceUses);

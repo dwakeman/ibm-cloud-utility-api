@@ -21,6 +21,7 @@ const querystring = require('querystring');
 const log4js = require('log4js');
 const logger = log4js.getLogger(appName);
 logger.level = 'trace';
+const iamapi = require('./iamapi');
 
 /**
  * Module object that is this module
@@ -211,21 +212,49 @@ rcapi.getInstanceUses = async (req, res, next) => {
  */
 rcapi.getToken = async (req, res, next) => {
 
-        logger.debug('[getToken] Entering function.....')
-    
-        logger.debug('[getToken] request headers:');
-        logger.debug(JSON.stringify(req.headers));
+    logger.debug('[getToken] Entering function.....')
+
+    logger.debug('[getToken] request headers:');
+    logger.debug(JSON.stringify(req.headers));
+
 
     
-        
-        let response = await getAuthToken(req);
+//        let response = await getAuthToken(req);
+    let response = await iamapi.getAuthToken(req);
+
+    logger.debug('[getToken] Exiting function.....' + JSON.stringify(response));
+    res.writeHead(200, {'Content-Type': 'application/json'});
+    res.write(JSON.stringify(response));
+    res.end();
+
+};
+
+/**
+ * Get a key from Key Protect
+ * 
+ * This function is mapped to the '/key/:keyid' route in the API
+ * It will retrieve a key from an instance of Key Protect
+ * 
+ * Method: GET
+ * 
+ * NOTE: This method requires the following environment variables
+ *       KEY_PROTECT_INSTANCE - the GUID of your Key Protect instance
+ *       IBM_API_KEY - a valid API key for a user or service id that has access to the Key Protect instance
+ */
+rcapi.getResourceGroups = async (req, res, next) => {
+
+    let path = '/v2/resource_groups';
+
+    logger.debug('[getResourceGroups] entering function....');
     
-        logger.debug('[getToken] Exiting function.....' + JSON.stringify(response));
-        res.writeHead(200, {'Content-Type': 'application/json'});
-        res.write(JSON.stringify(response));
-        res.end();
-    
-    };
+    let response = await callApi(req, path);
+
+    logger.debug('[getResourceGroups] Exiting function.....');
+    res.writeHead(200, {'Content-Type': 'application/json'});
+    res.write(JSON.stringify(response));
+    res.end();
+
+}; // of function getResourceGroups
 
 
 /**
@@ -324,7 +353,8 @@ async function callApi(req, path) {
     if (req.headers.authorization) {
         authToken = req.headers.authorization;
     } else {
-        let newToken = await getAuthToken(req);
+//        let newToken = await getAuthToken(req);
+        let newToken = await iamapi.getAuthToken(req);
         authToken = 'Bearer ' + newToken.access_token;
     }
 //    let newToken = await getAuthToken(req);
@@ -387,6 +417,8 @@ async function callApi(req, path) {
  *  an Authorization header whose value is 'Bearer <access_token>'
  * 
  */
+
+/*
 function getAuthToken(req) {
 
     logger.trace('[getAuthToken] entering function....');
@@ -396,12 +428,7 @@ function getAuthToken(req) {
 
     let apiKey = req.headers['x-api-key'];
     return new Promise ((resolve, reject) => {
-/*
-        if (req.headers.authorization) {
-            logger.debug('[getAuthToken] Found an Authorization header.... will use that.')
-            resolve(req.headers.authorization)
-        } else if (req.headers['x-api-key']) {
-*/
+
             logger.debug('[getAuthToken] exchanging API key for auth token ');
 
             const formData = querystring.stringify({
@@ -453,7 +480,7 @@ function getAuthToken(req) {
 
     });
 }; //end of function getAuthToken
-
+*/
 
 /**
  * Internal function to validate that the configuration is correct.  If not return an error message. 
