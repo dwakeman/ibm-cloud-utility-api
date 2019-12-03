@@ -23,8 +23,8 @@ const bodyParser = require('body-parser');
 const rcapi = require('./routes/rcapi');
 const iamapi = require('./routes/iamapi');
 const logger = log4js.getLogger(appName);
-logger.level ='trace';
-
+logger.level = process.env.LOG_LEVEL ? process.env.LOG_LEVEL : 'info';
+logger.info('[APP] - Log level is ' + logger.level);
 
 // enabling Cross Origin support
 app.use(function(req, res, next) {

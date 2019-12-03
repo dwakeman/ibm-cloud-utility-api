@@ -20,7 +20,8 @@ var url = require('url');
 const querystring = require('querystring');
 const log4js = require('log4js');
 const logger = log4js.getLogger(appName);
-logger.level = 'trace';
+logger.level = process.env.LOG_LEVEL ? process.env.LOG_LEVEL : 'info';
+logger.info('[IAMAPI] - Log level is ' + logger.level);
 
 /**
  * Module object that is this module
@@ -47,11 +48,9 @@ iamapi.getToken = async (req, res, next) => {
     logger.debug('[getToken] request headers:');
     logger.debug(JSON.stringify(req.headers));
 
-
-    
     let response = await iamapi.getAuthToken(req);
 
-    logger.debug('[getToken] Exiting function.....' + JSON.stringify(response));
+    logger.debug('[getToken] Exiting function.....');
     res.writeHead(200, {'Content-Type': 'application/json'});
     res.write(JSON.stringify(response));
     res.end();
@@ -79,60 +78,50 @@ iamapi.getAuthToken = (req) => {
 
     let apiKey = req.headers['x-api-key'];
     return new Promise ((resolve, reject) => {
-/*
-        if (req.headers.authorization) {
-            logger.debug('[getAuthToken] Found an Authorization header.... will use that.')
-            resolve(req.headers.authorization)
-        } else if (req.headers['x-api-key']) {
-*/
-            logger.debug('[getAuthToken] exchanging API key for auth token ');
 
-            const formData = querystring.stringify({
-                "grant_type": "urn:ibm:params:oauth:grant-type:apikey",
-                "apikey": apiKey
+        logger.debug('[getAuthToken] exchanging API key for auth token ');
+
+        const formData = querystring.stringify({
+            "grant_type": "urn:ibm:params:oauth:grant-type:apikey",
+            "apikey": apiKey
+        });
+    
+        const headers = {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    
+        const options = {
+            hostname: 'iam.cloud.ibm.com',
+            port: 443,
+            path: '/identity/token',
+            method: 'POST',
+            headers: headers
+        }
+
+        const req = https.request(options, (res) => {
+
+            let rawbody = '';
+
+            res.on('data', d => {
+                rawbody += d;
             });
-        
-            const headers = {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        
-            const options = {
-                hostname: 'iam.cloud.ibm.com',
-                port: 443,
-                path: '/identity/token',
-                method: 'POST',
-                headers: headers
-            }
 
-            const req = https.request(options, (res) => {
+            res.on('error', err => {
+                logger.debug('[getAuthToken] exiting with error....');
+                reject(err);
+            });
 
-                let rawbody = '';
+            res.on('end', () =>{
+                logger.debug('[getAuthToken] exiting with success....');
+                body = JSON.parse(rawbody);
+                resolve(body);                
+            });
 
-                res.on('data', d => {
-                    rawbody += d;
-                });
+        })
 
-                res.on('error', err => {
-                    logger.debug('[getAuthToken] exiting with error....');
-                    reject(err);
-                });
-
-                res.on('end', () =>{
-                    logger.debug('[getAuthToken] exiting with success....');
-                    body = JSON.parse(rawbody);
-                    resolve(body);                
-                });
-
-
-
-            })
-
-            logger.debug('[getAuthToken] writing form data');
-            req.write(formData);
-            req.end();
-        
-
-
+        logger.debug('[getAuthToken] writing form data');
+        req.write(formData);
+        req.end();
 
     });
 }; //end of function getAuthToken

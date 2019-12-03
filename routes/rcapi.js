@@ -20,9 +20,10 @@ var url = require('url');
 const querystring = require('querystring');
 const log4js = require('log4js');
 const logger = log4js.getLogger(appName);
-logger.level = 'trace';
+logger.level = process.env.LOG_LEVEL ? process.env.LOG_LEVEL : 'info';
 const iamapi = require('./iamapi');
 
+logger.info('[RCAPI] - Log level is ' + logger.level);
 /**
  * Module object that is this module
  */
@@ -198,36 +199,7 @@ rcapi.getInstanceUses = async (req, res, next) => {
     
     };
 
-/**
- * Get a key from Key Protect
- * 
- * This function is mapped to the '/key/:keyid' route in the API
- * It will retrieve a key from an instance of Key Protect
- * 
- * Method: GET
- * 
- * NOTE: This method requires the following environment variables
- *       KEY_PROTECT_INSTANCE - the GUID of your Key Protect instance
- *       IBM_API_KEY - a valid API key for a user or service id that has access to the Key Protect instance
- */
-rcapi.getToken = async (req, res, next) => {
 
-    logger.debug('[getToken] Entering function.....')
-
-    logger.debug('[getToken] request headers:');
-    logger.debug(JSON.stringify(req.headers));
-
-
-    
-//        let response = await getAuthToken(req);
-    let response = await iamapi.getAuthToken(req);
-
-    logger.debug('[getToken] Exiting function.....' + JSON.stringify(response));
-    res.writeHead(200, {'Content-Type': 'application/json'});
-    res.write(JSON.stringify(response));
-    res.end();
-
-};
 
 /**
  * Get a key from Key Protect
@@ -360,7 +332,7 @@ async function callApi(req, path) {
 //    let newToken = await getAuthToken(req);
     // getAuthToken should return the full object as returned from the IAM API.  
 
-    logger.trace('[callApi] The authentication token is ' + authToken);
+//    logger.trace('[callApi] The authentication token is ' + authToken);
     logger.trace('[callApi] The path is ' + path);
 
     const headers = {
@@ -391,7 +363,7 @@ async function callApi(req, path) {
             });
 
             res.on('end', () =>{
-                logger.trace('[callApi] exiting with success.... returning ' + rawbody);
+                logger.trace('[callApi] exiting with success....');
                 body = JSON.parse(rawbody);
                 resolve(body)                
             })
@@ -406,148 +378,9 @@ async function callApi(req, path) {
 
 
 
-/**
- * Internal function to exchange an IBM Cloud API Key for an IAM oauth token for authentication to 
- * the Key Protect API
- * 
- *  Parameters:
- *     apikey - the API Key to be used to obtain the oauth token
- * 
- *  Returns a JSON object where the oath token is in the 'access_token' field.  It should be used to form
- *  an Authorization header whose value is 'Bearer <access_token>'
- * 
- */
-
-/*
-function getAuthToken(req) {
-
-    logger.trace('[getAuthToken] entering function....');
-//    logger.trace('[getAuthToken] Authorization header is ' + req.headers.authorization);
-    logger.debug('[getAuthToken] x-api-key header is ' + req.headers['x-api-key']);
-    logger.debug('[getAuthToken] headers: ' + JSON.stringify(req.headers));
-
-    let apiKey = req.headers['x-api-key'];
-    return new Promise ((resolve, reject) => {
-
-            logger.debug('[getAuthToken] exchanging API key for auth token ');
-
-            const formData = querystring.stringify({
-                "grant_type": "urn:ibm:params:oauth:grant-type:apikey",
-                "apikey": apiKey
-            });
-        
-            const headers = {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        
-            const options = {
-                hostname: 'iam.cloud.ibm.com',
-                port: 443,
-                path: '/identity/token',
-                method: 'POST',
-                headers: headers
-            }
-
-            const req = https.request(options, (res) => {
-
-                let rawbody = '';
-
-                res.on('data', d => {
-                    rawbody += d;
-                });
-
-                res.on('error', err => {
-                    logger.debug('[getAuthToken] exiting with error....');
-                    reject(err);
-                });
-
-                res.on('end', () =>{
-                    logger.debug('[getAuthToken] exiting with success....');
-                    body = JSON.parse(rawbody);
-                    resolve(body);                
-                });
 
 
 
-            })
-
-            logger.debug('[getAuthToken] writing form data');
-            req.write(formData);
-            req.end();
-        
-
-
-
-    });
-}; //end of function getAuthToken
-*/
-
-/**
- * Internal function to validate that the configuration is correct.  If not return an error message. 
- * 
- *  Parameters:
- *     apikey - the API Key to be used to obtain the oauth token
- * 
- *  Returns a JSON object where the oath token is in the 'access_token' field.  It should be used to form
- *  an Authorization header whose value is 'Bearer <access_token>'
- * 
- */
-function validateConfig() {
-
-    logger.debug('entering validateConfig....');
-/*
-    const formData = querystring.stringify({
-        "grant_type": "urn:ibm:params:oauth:grant-type:apikey",
-        "apikey": apikey
-    });
-
-    const headers = {
-        'Content-Type': 'application/x-www-form-urlencoded'
-    }
-
-    const options = {
-        hostname: 'iam.cloud.ibm.com',
-        port: 443,
-        path: '/identity/token',
-        method: 'POST',
-        headers: headers
-    }
-*/
-    return new Promise ((resolve, reject) => {
-        
-        //Do validations.  Resolve if fine, reject if error.  Return JSON with error messages.
-        //  - KEY_PROTECT_INSTANCE is set
-        //  - IBM_API_KEY is set
-        //  - X-Sensitive-Data header is present and the specified key is in the input.
- 
-        /*
-        const req = https.request(options, (res) => {
-
-            let rawbody = '';
-
-            res.on('data', d => {
-                rawbody += d;
-            });
-
-            res.on('error', err => {
-                logger.debug('exiting getAuthToken with error....');
-                reject(err)
-            });
-
-            res.on('end', () =>{
-                logger.debug('exiting getAuthToken with success....');
-                body = JSON.parse(rawbody);
-                resolve(body)                
-            })
-
-        });
-
-        logger.debug('In getAuthToken, writing form data');
-        req.write(formData);
-        req.end();
-*/
-    });
-}; //end of function validateConfig
 
 
 
