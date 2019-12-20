@@ -295,7 +295,7 @@ async function callApi(req, payload, path, headers, method) {
         });
 
         if (payload){
-            req.write(payload);
+            req.write(JSON.stringify(payload));
         }
         req.end();
     });
