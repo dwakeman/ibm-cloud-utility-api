@@ -278,6 +278,42 @@ rcapi.getResourceInstances = async (req, res, next) => {
  *       KEY_PROTECT_INSTANCE - the GUID of your Key Protect instance
  *       IBM_API_KEY - a valid API key for a user or service id that has access to the Key Protect instance
  */
+rcapi.getKeyProtectInstances = async (req, res, next) => {
+
+    // This is the use case where sensitive data is to be wrapped by a root key.  
+    // In this case the DEK is the sensitive data itself
+    
+        // Get parameters from the Request object
+//        let instanceId = req.params.instanceid;
+        let path = '/v2/resource_instances?type=service_instance&sub_type=kms';
+    
+        logger.debug('[getKeyProtectInstances] Entering function.....');
+        logger.debug('[getKeyProtectInstances] path: ' + path);
+
+
+        
+        let response = await callApi(req, path);
+    
+        logger.debug('[getKeyProtectInstances] Exiting function.....');
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.write(JSON.stringify(response));
+        res.end();
+    
+    };
+
+
+/**
+ * Get a key from Key Protect
+ * 
+ * This function is mapped to the '/key/:keyid' route in the API
+ * It will retrieve a key from an instance of Key Protect
+ * 
+ * Method: GET
+ * 
+ * NOTE: This method requires the following environment variables
+ *       KEY_PROTECT_INSTANCE - the GUID of your Key Protect instance
+ *       IBM_API_KEY - a valid API key for a user or service id that has access to the Key Protect instance
+ */
 rcapi.getAliasesForInstance = async (req, res, next) => {
 
     // This is the use case where sensitive data is to be wrapped by a root key.  
@@ -376,15 +412,5 @@ async function callApi(req, path) {
     });
 
 }; // end of function callApi
-
-
-
-
-
-
-
-
-
-
 
 module.exports = rcapi;

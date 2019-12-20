@@ -64,6 +64,7 @@ app.get('/instances', rcapi.getResourceInstances);
 app.get('/instances/:instanceid', rcapi.getResourceInstances);
 app.get('/instances/:instanceid/uses', rcapi.getInstanceUses);
 app.get('/instances/:instanceid/aliases', rcapi.getAliasesForInstance);
+app.get('/instances/keyprotect', rcapi.getKeyProtectInstances);
 //app.post('/encrypt/:keyid', keyprotect.encrypt);
 //app.post('/decrypt/:keyid', keyprotect.decrypt);
 
