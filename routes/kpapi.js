@@ -114,6 +114,48 @@ kpapi.getKeys = async (req, res, next) => {
     
     };
 
+/**
+ * Get a key from Key Protect
+ * 
+ * This function is mapped to the '/key/:keyid' route in the API
+ * It will retrieve a key from an instance of Key Protect
+ * 
+ * Method: GET
+ * 
+ * NOTE: This method requires the following environment variables
+ *       KEY_PROTECT_INSTANCE - the GUID of your Key Protect instance
+ *       IBM_API_KEY - a valid API key for a user or service id that has access to the Key Protect instance
+ */
+kpapi.getPoliciesForKey = async (req, res, next) => {
+
+    // This is the use case where sensitive data is to be wrapped by a root key.  
+    // In this case the DEK is the sensitive data itself
+    
+        // Get parameters from the Request object
+        let instanceId = req.params.instanceid;
+        let keyId = req.params.keyid;
+        let path = '/api/v2/keys/' + keyId + '/policies';
+    
+        logger.debug('[getPoliciesForKey] Entering function.....');
+        logger.debug('[getPoliciesForKey] Request parameters');
+        logger.debug('[getPoliciesForKey] Key Protect Instance ID: ' + instanceId);
+        logger.debug('[getPoliciesForKey] Key ID: ' + instanceId);
+        logger.debug('[getPoliciesForKey] path: ' + path);
+    
+        const headers = {
+            "bluemix-instance": instanceId,
+            "accept": 'application/vnd.ibm.kms.policy+json'
+        }
+        
+        let response = await callApi(req, null, path, headers, 'GET');
+    
+        logger.debug('[getKeyProtectInstancePolicies] Exiting function.....');
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.write(JSON.stringify(response));
+        res.end();
+    
+    };
+
 
 /**
  * Get a key from Key Protect

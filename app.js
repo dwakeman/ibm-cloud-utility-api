@@ -68,6 +68,7 @@ app.get('/instances/:instanceid/aliases', rcapi.getAliasesForInstance);
 app.get('/kpinstances', rcapi.getKeyProtectInstances);
 app.get('/kpinstances/:instanceid/policies', kpapi.getKeyProtectInstancePolicies);
 app.get('/kpinstances/:instanceid/keys', kpapi.getKeys);
+app.get('/kpinstances/:instanceid/keys/:keyid/policies', kpapi.getPoliciesForKey);
 app.post('/kpinstances/:instanceid/deletekey', kpapi.setKeyForDeletion);
 //app.put('/kpinstances/:instanceId/policies', rcapi.putKeyProtectInstancePolicies);
 //app.post('/encrypt/:keyid', keyprotect.encrypt);
