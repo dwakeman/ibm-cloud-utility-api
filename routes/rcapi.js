@@ -28,7 +28,8 @@ logger.info('[RCAPI] - Log level is ' + logger.level);
  * Module object that is this module
  */
 const rcapi = {};
-
+const ibmcloudUrl = process.env.IBMCLOUD_URL ? process.env.IBMCLOUD_URL : 'cloud.ibm.com';
+logger.info('[RCAPI] - The IBM Cloud URL is ' + ibmcloudUrl);
 
 /**
  * Get a key from Key Protect
@@ -340,8 +341,9 @@ async function callApi(req, path) {
         'Authorization': authToken
     }
 
+    
     const options = {
-        hostname: 'resource-controller.cloud.ibm.com',
+        hostname: 'resource-controller.' + ibmcloudUrl ,
         port: 443,
         path: path,
         method: 'GET',

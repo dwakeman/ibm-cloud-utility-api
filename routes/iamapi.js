@@ -28,6 +28,8 @@ logger.info('[IAMAPI] - Log level is ' + logger.level);
  */
 const iamapi = {};
 
+const ibmcloudUrl = process.env.IBMCLOUD_URL ? process.env.IBMCLOUD_URL : 'cloud.ibm.com';
+logger.info('[IAMAPI] - The IBM Cloud URL is ' + ibmcloudUrl);
 
 /**
  * Get a key from Key Protect
@@ -91,7 +93,7 @@ iamapi.getAuthToken = (req) => {
         }
     
         const options = {
-            hostname: 'iam.cloud.ibm.com',
+            hostname: 'iam.' + ibmcloudUrl,
             port: 443,
             path: '/identity/token',
             method: 'POST',
