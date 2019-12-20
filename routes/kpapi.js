@@ -114,8 +114,17 @@ async function callApi(req, path, headers) {
 */
     logger.debug('[KPAPI] - callApi with headers: ' + JSON.stringify(headers));    
 
+    const kphost;
+    if (ibmcloudUrl === 'test.cloud.ibm.com'){
+        kphost = 'qa.us-south.kms.' + ibmcloudUrl;
+    } else {
+        kphost = 'us-south.kms.' + ibmcloudUrl;
+    }
+
+    logger.debug('[KPAPI] - callApi with key protect host name: ' + kphost);    
+
     const options = {
-        hostname: 'resource-controller.' + ibmcloudUrl ,
+        hostname: kphost,
         port: 443,
         path: path,
         method: 'GET',
