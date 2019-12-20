@@ -176,7 +176,8 @@ kpapi.setKeyForDeletion = async (req, res, next) => {
     
         // Get parameters from the Request object
         let instanceId = req.params.instanceid;
-        let path = '/api/v2/instance/policies';
+        let keyId = req.params.keyid;
+        let path = '/api/v2/keys/' + keyId + '?action=setKeyForDeletion';
     
         logger.debug('[setKeyForDeletion] Entering function.....');
         logger.debug('[setKeyForDeletion] Request parameters');
