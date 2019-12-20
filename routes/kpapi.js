@@ -44,24 +44,28 @@ logger.info('[KPAPI] - The IBM Cloud URL is ' + ibmcloudUrl);
  *       KEY_PROTECT_INSTANCE - the GUID of your Key Protect instance
  *       IBM_API_KEY - a valid API key for a user or service id that has access to the Key Protect instance
  */
-kpapi.getKeyProtectInstances = async (req, res, next) => {
+kpapi.getKeyProtectInstancePolicies = async (req, res, next) => {
 
     // This is the use case where sensitive data is to be wrapped by a root key.  
     // In this case the DEK is the sensitive data itself
     
         // Get parameters from the Request object
         let instanceId = req.params.instanceid;
-        let path = instanceId ? '/v2/resource_instances/' + instanceId : '/v2/resource_instances';
+        let path = 'api/v2/instance/policies';
     
-        logger.debug('[getResourceInstances] Entering function.....');
-        logger.debug('[getResourceInstances] Request parameters');
-        logger.debug('[getResourceInstances] Resource Instance ID: ' + instanceId);
-        logger.debug('[getResourceInstances] path: ' + path);
+        logger.debug('[getKeyProtectInstancePolicies] Entering function.....');
+        logger.debug('[getKeyProtectInstancePolicies] Request parameters');
+        logger.debug('[getKeyProtectInstancePolicies] Resource Instance ID: ' + instanceId);
+        logger.debug('[getKeyProtectInstancePolicies] path: ' + path);
     
+        const headers = {
+            "bluemix-instance": instanceId,
+            "accept": 'application/vnd.ibm.kms.policy+json'
+        }
         
-        let response = await callApi(req, path);
+        let response = await callApi(req, path, headers);
     
-        logger.debug('[getResourceInstances] Exiting function.....');
+        logger.debug('[getKeyProtectInstancePolicies] Exiting function.....');
         res.writeHead(200, {'Content-Type': 'application/json'});
         res.write(JSON.stringify(response));
         res.end();
