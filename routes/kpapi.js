@@ -114,7 +114,7 @@ async function callApi(req, path, headers) {
 */
     logger.debug('[KPAPI] - callApi with headers: ' + JSON.stringify(headers));    
 
-    const kphost;
+    var kphost = '';
     if (ibmcloudUrl === 'test.cloud.ibm.com'){
         kphost = 'qa.us-south.kms.' + ibmcloudUrl;
     } else {
