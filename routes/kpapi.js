@@ -147,7 +147,7 @@ async function callApi(req, path, headers) {
             });
 
             res.on('end', () =>{
-                logger.trace('[callApi] exiting with success....');
+                logger.debug('[callApi] exiting with success....' + rawbody);
                 body = JSON.parse(rawbody);
                 resolve(body)                
             })
