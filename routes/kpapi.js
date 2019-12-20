@@ -60,7 +60,7 @@ kpapi.getKeyProtectInstancePolicies = async (req, res, next) => {
     
         const headers = {
             "bluemix-instance": instanceId,
-            "accept": 'application/vnd.ibm.kms.policy+json',
+            "accept": 'application/vnd.ibm.kms.key_action+json',
             "content-type": 'application/vnd.ibm.kms.policy+json'
         }
         
