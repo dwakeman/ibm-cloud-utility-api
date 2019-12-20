@@ -51,7 +51,7 @@ kpapi.getKeyProtectInstancePolicies = async (req, res, next) => {
     
         // Get parameters from the Request object
         let instanceId = req.params.instanceid;
-        let path = 'api/v2/instance/policies';
+        let path = '/api/v2/instance/policies';
     
         logger.debug('[getKeyProtectInstancePolicies] Entering function.....');
         logger.debug('[getKeyProtectInstancePolicies] Request parameters');
