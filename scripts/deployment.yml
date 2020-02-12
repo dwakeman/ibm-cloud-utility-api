@@ -35,3 +35,17 @@ spec:
   # label keys and values that must match in order to receive traffic for this service
   selector:
     app: utlity-api
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: utility-api-ingress
+spec:
+  rules:
+  - host: utility-api.dev.eyebeemdemos.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: utility-api-service
+          servicePort: 8080
