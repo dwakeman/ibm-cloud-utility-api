@@ -21,7 +21,7 @@ spec:
         description: the ibmcloud registry namespace
       - name: imageName
         description: the base image name
-        default: "hello-containers-tekton"
+        default: "cloud-utility-api"
       - name: registryRegion
         description: the ibmcloud registry region  
   steps:
@@ -178,7 +178,7 @@ spec:
         description: the ibmcloud api endpoint
         default: "https://cloud.ibm.com"
       - name: deployment-file
-        default: deployment.yml
+        default: scripts/deployment.yml
       - name: clusterNamespace
         default: prod
       - name: cluster
