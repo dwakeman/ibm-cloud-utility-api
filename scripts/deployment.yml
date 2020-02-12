@@ -48,4 +48,4 @@ spec:
       - path: /
         backend:
           serviceName: utility-api-service
-          servicePort: 8080
+          servicePort: 80
