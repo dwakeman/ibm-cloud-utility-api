@@ -55,6 +55,10 @@ kind: Ingress
 metadata:
   name: utility-api-ingress
 spec:
+  tls:
+  - hosts:
+    - utility-api.dev.eyebeemdemos.com
+    secretName: eyebeemdemos-secret-tls
   rules:
   - host: utility-api.dev.eyebeemdemos.com
     http:
