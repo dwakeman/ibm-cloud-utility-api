@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
       - name: utility-api
-        image: webapp:1
+#        image: us.icr.io/davewakeman/cloud-utility-api:master-0-0d53ae2a-20200212181301
+        image: webapp:1   #<--- The tekton scripts change this
         # for local development against minikube registry
         #imagePullPolicy: Never        
         ports:
