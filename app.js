@@ -25,9 +25,13 @@ const rcapi = require('./routes/rcapi');
 const iamapi = require('./routes/iamapi');
 const kpapi = require('./routes/kpapi');
 const logger = log4js.getLogger(appName);
+const appRegion = process.env.APP_REGION ? process.env.APP_REGION : "local";
+const appRuntime = process.env.APP_RUNTIME ? process.env.APP_RUNTIME : "localhost";
 logger.level = process.env.LOG_LEVEL ? process.env.LOG_LEVEL : 'info';
 logger.info('[APP] - Log level is ' + logger.level);
 logger.info('[APP] - App Version is ' + appVersion);
+
+
 
 // enabling Cross Origin support
 app.use(function(req, res, next) {
@@ -42,14 +46,22 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({ limit: '50mb' }));
 
 app.get('/',(req,res) => {
-    res.send({"message" : "Yay.. I'm running!  But I am an API so there is nothing to see here!!"});
+    res.send({
+        "message" : "Yay.. I'm running!  But I am an API so there is nothing to see here!!",
+        "version": appVersion,
+        "loglevel": logger.level,
+        "region": appRegion,
+        "runtime": appRuntime 
+    });
 });
 
 app.get('/health',(req,res) => {
     res.send({ 
         "status" : "UP",
-        "region" : process.env.APP_REGION ? process.env.APP_REGION : "local",
-        "runtime": process.env.APP_RUNTIME ? process.env.APP_RUNTIME : "localhost"
+        "version": appVersion,
+        "loglevel": logger.level,
+        "region" : appRegion,
+        "runtime": appRuntime
     });
 });
 
