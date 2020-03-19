@@ -19,6 +19,7 @@ const express = require('express');
 var app = express();
 const log4js = require('log4js');
 const appName = require('./package').name;
+const appVersion = require('./package').version;
 const bodyParser = require('body-parser');
 const rcapi = require('./routes/rcapi');
 const iamapi = require('./routes/iamapi');
@@ -26,6 +27,7 @@ const kpapi = require('./routes/kpapi');
 const logger = log4js.getLogger(appName);
 logger.level = process.env.LOG_LEVEL ? process.env.LOG_LEVEL : 'info';
 logger.info('[APP] - Log level is ' + logger.level);
+logger.info('[APP] - App Version is ' + appVersion);
 
 // enabling Cross Origin support
 app.use(function(req, res, next) {

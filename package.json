@@ -1,6 +1,6 @@
 {
     "name": "ibm-cloud-utility-api",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Utility API for IBM Cloud",
     "main": "app.js",
     "private": true,
